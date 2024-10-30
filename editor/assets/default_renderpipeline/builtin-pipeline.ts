@@ -154,6 +154,7 @@ class CameraConfigs {
     enableFXAA = false;
     enableFSR = false;
     enableHDR = false;
+    enablePlanarReflectionProbe = false;
     useFullPipeline = false;
     singleForwardRadiancePass = false;
     radianceFormat = gfx.Format.RGBA8;
@@ -211,6 +212,8 @@ function setupCameraConfigs(
         && !!camera.scene
         && !!camera.scene.mainLight
         && camera.scene.mainLight.shadowEnabled;
+
+    cameraConfigs.enablePlanarReflectionProbe = isMainGameWindow || camera.cameraUsage === CameraUsage.SCENE_VIEW;
 
     cameraConfigs.enableProfiler = DEBUG && isMainGameWindow;
 
@@ -647,12 +650,12 @@ if (rendering) {
             const depthStencilName = this._cameraConfigs.depthStencilName;
 
             const viewport = camera.viewport;  // Reduce C++/TS interop
-            this._viewport.left = Math.floor(viewport.x * width);
-            this._viewport.top = Math.floor(viewport.y * height);
+            this._viewport.left = Math.round(viewport.x * width);
+            this._viewport.top = Math.round(viewport.y * height);
             // Here we must use camera.viewport.width instead of camera.viewport.z, which
             // is undefined on native platform. The same as camera.viewport.height.
-            this._viewport.width = Math.max(Math.floor(viewport.width * width), 1);
-            this._viewport.height = Math.max(Math.floor(viewport.height * height), 1);
+            this._viewport.width = Math.max(Math.round(viewport.width * width), 1);
+            this._viewport.height = Math.max(Math.round(viewport.height * height), 1);
 
             const clearColor = camera.clearColor;  // Reduce C++/TS interop
             this._clearColor.x = clearColor.x;
@@ -1294,12 +1297,12 @@ if (rendering) {
 
             // Prepare camera viewport
             const viewport = camera.viewport; // Reduce C++/TS interop
-            this._viewport.left = Math.floor(viewport.x * width);
-            this._viewport.top = Math.floor(viewport.y * height);
+            this._viewport.left = Math.round(viewport.x * width);
+            this._viewport.top = Math.round(viewport.y * height);
             // Here we must use camera.viewport.width instead of camera.viewport.z, which
             // is undefined on native platform. The same as camera.viewport.height.
-            this._viewport.width = Math.max(Math.floor(viewport.width * width), 1);
-            this._viewport.height = Math.max(Math.floor(viewport.height * height), 1);
+            this._viewport.width = Math.max(Math.round(viewport.width * width), 1);
+            this._viewport.height = Math.max(Math.round(viewport.height * height), 1);
 
             // MSAA
             const enableMSAA = !disableMSAA && this._cameraConfigs.enableMSAA;
@@ -1506,6 +1509,9 @@ if (rendering) {
                 const height = Math.max(Math.floor(area.y), 1);
 
                 if (probe.probeType === renderer.scene.ProbeType.PLANAR) {
+                    if (!this._cameraConfigs.enablePlanarReflectionProbe) {
+                        continue;
+                    }
                     const window: renderer.RenderWindow = probe.realtimePlanarTexture!.window!;
                     const colorName = `PlanarProbeRT${probeID}`;
                     const depthStencilName = `PlanarProbeDS${probeID}`;

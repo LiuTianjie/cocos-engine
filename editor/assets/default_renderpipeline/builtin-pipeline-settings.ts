@@ -78,7 +78,10 @@ export class BuiltinPipelineSettings extends Component {
     @property(CCBoolean)
     protected _editorPreview = false;
 
-    @property(CCBoolean)
+    @property({
+        displayName: 'Editor Preview (Experimental)',
+        type: CCBoolean,
+    })
     get editorPreview(): boolean {
         return this._editorPreview;
     }
@@ -324,12 +327,6 @@ export class BuiltinPipelineSettings extends Component {
         return this._settings.bloom.threshold;
     }
 
-    @property({
-        tooltip: 'i18n:bloom.intensity',
-        group: { id: 'Bloom', name: 'Bloom (PostProcessing)', style: 'section' },
-        type: CCFloat,
-        min: 0,
-    })
     set bloomIntensity(value: number) {
         this._settings.bloom.intensity = value;
     }

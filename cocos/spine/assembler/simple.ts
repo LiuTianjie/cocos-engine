@@ -32,7 +32,7 @@ import { BlendFactor } from '../../gfx';
 import { legacyCC } from '../../core/global-exports';
 import { RenderData } from '../../2d/renderer/render-data';
 import { director } from '../../game';
-import spine from '../lib/spine-core.js';
+import spine from '../lib/spine-core';
 import { Color, EPSILON, Vec3 } from '../../core';
 import { MaterialInstance } from '../../render-scene';
 
@@ -72,7 +72,7 @@ function _getSlotMaterial (blendMode: number, comp: Skeleton): MaterialInstance 
         dst = BlendFactor.ONE_MINUS_SRC_ALPHA;
         break;
     case 3:
-        src = BlendFactor.ONE;
+        src = _premultipliedAlpha ? BlendFactor.ONE :  BlendFactor.SRC_ALPHA;
         dst = BlendFactor.ONE_MINUS_SRC_COLOR;
         break;
     case 0:
